@@ -1,0 +1,10 @@
+"\000M\000o\000n\000y \254\000t\000 \000g\000a\000n\000t\000\243\000n\000x"
+
+"Mony€t gant£nx".unpack('U*')
+
+utf8 = Iconv.new('utf-8', 'utf-16be').iconv(utf16be)
+
+Riyu Kosaka, 小坂りゆ
+
+ascii//translit
+ascii//ignore

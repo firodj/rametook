@@ -1,0 +1,26 @@
+Hasil Raihan #{komentar}
+separator: ' '
+
+INFO
+ok: 
+----
+INFO #{enum:kec}
+--
+INFO #{enum:kec} #{enum:kel}
+---
+
+INPUT #{assign} #{assign} #{assign}
+ok: #{valid}
+error: Inputan salah #{assign}. Nih contohnya: #{valid}
+
+---------------------------------
+COMMENT #{text}
+COMMENT komentar_anda
+  #{text} : teks apa aja 
+error: Maaf Komentar anda kosong
+ok: Terimakasih Atas Komentar Anda
+ok: Komentar anda #{text} sudah kami terima, tararengkiu
+  #{text} : teks yg diimput tapi dibatasi berapa karakter aja
+
+TEST KWKW T 5  ASEAW AWT2= ASFkJ
+    |

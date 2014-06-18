@@ -1,0 +1,7 @@
+--- 
+username: root
+adapter: mysql
+host: 127.0.0.1 # localhost
+database: rametook_firo
+password: 
+# socket: /var/run/mysqld/mysqld.sock

@@ -1,0 +1,21 @@
+    @main_window = Gtk::Window.new("Hello World sample")
+    @main_window.signal_connect("destroy") { on_main_window_destroy }    
+    @start_button = Gtk::Button.new("Start")
+    @start_button.signal_connect("clicked") { on_start_clicked }      
+    @stop_button = Gtk::Button.new("Stop")
+    @stop_button.signal_connect("clicked") { on_stop_clicked }    
+    @info_label = Gtk::Label.new( "Checking..." )
+    @info_label.justify = Gtk::JUSTIFY_CENTER
+    
+    @main_window.border_width = 10
+    
+    @vbox = Gtk::VBox.new(false, 5)
+    @hbox = Gtk::HBox.new(false, 5)
+    @main_window.add(@vbox)
+    
+    @hbox.pack_start(@start_button, true, true, 0)
+    @hbox.pack_start(@stop_button,  true, true, 0)
+    @vbox.pack_start(@hbox, true, true, 0)
+    @vbox.pack_start(@info_label, true, true, 0)
+    
+    @main_window.show_all

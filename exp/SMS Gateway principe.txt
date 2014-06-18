@@ -1,0 +1,48 @@
+modem gsm/cdma regexp parser
+
+1. First turn off command echo to avoid wrong response (ATE0), disable quiet result mode (ATQ0), verbose result codes (ATV1)
+2. reponse are: AT command response; and Network Notification
+3. AT command response only found after AT command response with final result OK|ERROR|...
+4. Network notification response can found anytime
+5. please consider, network notification response can be found before AT command response, 
+   due to there is a time from 1st character of AT command sent to last character and execute that AT command.
+6. the safest method is, always wait AT command response before send the another AT command.
+7. there'is a case:  PC <--> Modem <--> Network
+   T | (PC -> Modem) | (Network -> Modem) | (Modem -> PC)
+   0   AT                                 
+   1   +CMGL           +CDS: ...
+   2   ="ALL"                
+   3   <CR>
+   4                                        +CDS:                                        
+   5                   +CMTI:...            (AT-command response)
+   6                                        +CMTI:
+   7
+there'r the explanation:
+0. at T-0 to T-3, PC sent AT command to modem
+1. at T-1, modem receive +CDS network notification and then fill the 'modem->pc' buffer (not shown)
+2. at T-3, modem execute AT+CMGL command
+3. at T-4 to T-6, PC request (not shown) to modem for receiving modem->pc buffer 
+4. at T-5, modem receive another +CMTI notification and then fill the 'modem->pc' buffer (not shown)
+5. so, the received buffer are:
+   1- +CDS
+   2- (AT-command response)
+   3- +CMTI
+Of coure the AT-command response is the last executed AT command, that is AT+CMGL response.
+How to pharse them? Every response is pre & post-fix with <CR><LF> (\r\n).
+For AT-command response, the result are specified at-command respons and followed with the final result.
+The AT-command final result are ERROR or OK or other final result that depend on
+type of modem. For example if AT+CMEE=1 then another final result is +CME.
+Of course again, Network notification response don't have final result.
+Refer to your modem's manual for specified response format. This will help you how to read them.
+
+Regular Expression:
+before, response, after = .scan(/(.*?)\r\n(OK|ERROR|\+.*?)(\r\n.*)/im)[0]
+.scan(/(.*)\r\n(OK.*?|(\+CM.\s)?ERROR.*?)(\r\n.*)/im)
+
+.scan(/(.*?)\r\n((OK)\s?(.*?)|(ERROR)\s?(.*?)|(\+|\~|\!|\&)((.*?)(\:\s?(.*?))?))(\r\n.*)/im)
+
+
+Replaced Result Code:
+AT+CRC  RING change +CRING
+AT+CMEE ERROR add +CME +CMS
+
