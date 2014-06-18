@@ -1,7 +1,0 @@
-# Logfile created on Mon May 05 20:44:46 +0700 2008 by /
-[2008-05-07 16:35:52] 	/dev/ttyUSB0	RECV	628157005396 (1)	PUL: Status pemakaian PULsa Anda : Rp 187675, dihitung dari Tagihan terakhir, belum termasuk abonemen & PPN 10%.
-[2008-05-09 14:27:59] 	/dev/ttyUSB0	RECV	622270573111 (1)	Hi AXIS, would you like to send back my sms!?
-[2008-05-09 14:32:09] 	/dev/ttyUSB0	SEND	622270573111 (16) []	Hi FLEXI, Ok, I reply you with this!!!
-[2008-05-09 14:32:15] 	/dev/ttyUSB0	STAT	(16) SENT 2008-05-09 14:32:16	
-[2008-05-09 14:39:34] 	/dev/ttyUSB0	SEND	622270573111 (17) []	CMGS<CR><LF>> <CR><LF>> PROMPT<CR><LF>
-[2008-05-09 14:39:41] 	/dev/ttyUSB0	STAT	(17) SENT 2008-05-09 14:39:41	
