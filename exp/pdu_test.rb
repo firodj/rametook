@@ -1,7 +1,6 @@
 #!/usr/bin/env ruby
 
-require 'include/pdu'
-require 'iconv'
+require File.dirname(__FILE__) + '/../boot'
 
 puts "== test toa_int2ary"
 a = PDU.toa_int2ary(0x91)
@@ -52,7 +51,7 @@ info = PDU.read(pdu_string, length_pdu)
 p info
 
 
-exit
+p PDU.write({'number' => '777', 'message' => 'PUL', 'first_octet' => ['sms-submit', 'v-rel']})
 
 puts "== test PDU.write() then assert with PDU.read()"
 info = {'first_octet' => ['sms-submit', 'v-rel'], 'message_ref' => 0, 

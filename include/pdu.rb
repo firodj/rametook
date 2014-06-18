@@ -1,50 +1,9 @@
-#--
-#    This file is part of Rametook
-#
-#    Rametook is free software; you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
-#    the Free Software Foundation; either version 3 of the License, or
-#    (at your option) any later version.
-#
-#    Rametook is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
-#
-#    You should have received a copy of the GNU General Public License
-#    along with this program.  If not, see <http://www.gnu.org/licenses/>
-#++
+# This file is part of Rametook 0.3.6 (in transition)
 
 # for parsing HTML (gsm spec)
 require 'cgi'
 # for converting
 require 'iconv'
-
-class String
-
-  # Swap each nibbles (a pair characters) in BCD string
-  # (only for semi-decimal).
-  #
-  # Example: 1234567 (12 34 56 7F) to 214365F7 (21 43 65 F7)
-  #
-  # F character will be added to make even string before swapped
-  # (also will be removed for reverse)
-  #
-  def nibble_swap
-    len = self.length
-    swap_str = ""
-    str = self
-    str += "F" if len % 2 != 0
-  
-    i = 0
-    while i < len
-      swap_str += str[i,2].reverse
-      i += 2
-    end
-    swap_str.chomp! 'F'
-    return swap_str
-  end
-end
 
 # == PDU(protocol data unit) fundamentals
 # This is the PDU class for write and read using SMS PDU format.
@@ -368,7 +327,7 @@ class PDU
     pdu << "%02X" % dcs_ary2int( info['data_coding'] )
 
     if info['first_octet'].include? 'sms-deliver'      
-      pdu << info['service_time'].strftime('%y%m%d%H%M%S00').nibble_swap
+      pdu << info['service_center_time'].strftime('%y%m%d%H%M%S00').nibble_swap
     elsif info['first_octet'].include? 'sms-submit'    	    
 	    tp_vpf = info['first_octet'] & FoVpf
 	    if !tp_vpf.empty?
@@ -398,7 +357,7 @@ class PDU
   # [+type_number+] type of number
   # [+number+] mobile/phone number
   # [+data_coding+] data coding scheme
-  # [+service_time+] service center time stamp
+  # [+service_center_time+] service center time stamp
   # [+message+] message
   #
   def self.read(pdu, actual_length = nil)
@@ -457,7 +416,7 @@ class PDU
       # TP-SCTS: sms-status-report
       tp_scts = pdu[0,14].nibble_swap
 	    # "GMT: #{tp_scts[12,2]}"
-	    info['service_time'] = begin
+	    info['service_center_time'] = begin
 	      Time.local(tp_scts[0,2],
 	        tp_scts[2,2],
 	        tp_scts[4,2],
@@ -511,7 +470,7 @@ class PDU
 	    
 	    # "GMT: #{tp_scts[12,2]}"
 	    
-	    info['service_time'] = begin
+	    info['service_center_time'] = begin
 	      Time.local(tp_scts[0,2],
 	        tp_scts[2,2],
 	        tp_scts[4,2],

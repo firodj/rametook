@@ -1,0 +1,26 @@
+0x80,telematic interworking not supported
+0x81,short message Type 0 not supported
+0x82,cannot replace short message
+0x8F,unspecified TP-PID error
+0x90,data coding scheme (alphabet) not supported
+0x91,message class not supported
+0x9F,unspecified TP-DCS error
+0xA0,command cannot be actioned
+0xA1,command unsupported
+0xAF,unspecified TP-Command error
+0xB0,TPDU not supported
+0xC0,SC busy
+0xC1,no SC subscription
+0xC2,SC system failure
+0xC3,invalid SME address
+0xC4,destination SME barred
+0xC5,SM Rejected-Duplicate SM
+0xC6,TP-VPF not supported
+0xC7,TP-VP not supported
+0xD0,SIM SMS storage full
+0xD1,no SMS storage capability in SIM
+0xD2,error in MS
+0xD3,memory Capacity Exceeded
+0xD4,SIM Application Toolkit busy
+0xD5,SIM data download error
+0xFF,unspecified error cause

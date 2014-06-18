@@ -2,45 +2,16 @@
 #--
 #    Rametook - Send/Receive SMS via Modem/Serial-Port
 #    Copyright (C) 2007  Fadhil Mandaga
-#
-#    Rametook is free software; you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
-#    the Free Software Foundation; either version 3 of the License, or
-#    (at your option) any later version.
-#
-#    Rametook is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
-#
-#    You should have received a copy of the GNU General Public License
-#    along with this program.  If not, see <http://www.gnu.org/licenses/>
 #++
 
-APP_INFO = "Rametook v0.3.4rc - 2008-05-14"
+APP_INFO = "Rametook v0.3.7rc - 2008-08-04"
 
-require 'logger'
-require 'serialport'
-require 'thread'
-require 'yaml'
-require 'iconv'
-require 'socket'
-require 'getoptlong'
-require 'rubygems'
-require 'daemons'
-require 'active_record'
-gem 'activerecord'
-gem 'daemons'
+require File.dirname(__FILE__) + '/boot'
 
-require 'include/util.rb'
-require 'include/modem.rb'
-require 'include/device.rb'
-require 'include/main.rb'
-require 'include/model.rb'
-require 'include/pdu.rb'
-
-module SmsGateway
-  class Rametook
+module Rametook
+  class Application
+    @@rails_env = ENV['RAILS_ENV'] ? ENV['RAILS_ENV'].dup : "development"
+      
     # read coniguration
     def self.configure
       cmd = ''
@@ -49,19 +20,22 @@ module SmsGateway
         [ '--help', '-h', GetoptLong::NO_ARGUMENT ],
         [ '--version', '-v', GetoptLong::NO_ARGUMENT ],
         [ '--color', '-c', GetoptLong::NO_ARGUMENT ],
-        [ '--raw', '-r', GetoptLong::NO_ARGUMENT ]
+        [ '--raw', '-r', GetoptLong::NO_ARGUMENT ],
+        [ '--environment', '-e', GetoptLong::REQUIRED_ARGUMENT]
       )    
       
       opts.each do |opt, arg|
         case opt
           when '--color'
-            SmsGateway::Utility.debug |= SmsGateway::Utility::COLOR
+            Rametook::Utility.debug |= Rametook::Utility::COLOR
           when '--raw'
-            SmsGateway::Utility.debug |= SmsGateway::Utility::RAW
+            Rametook::Utility.debug |= Rametook::Utility::RAW
           when '--help'
             cmd = 'help'
           when '--version'
             cmd = 'version'
+          when '--environment'
+            @@rails_env = arg         
         end
       end
                 
@@ -80,14 +54,14 @@ module SmsGateway
         @@cmd = cmd
       end
      
-      SmsGateway::Database.load_config('database.yml')
+      # Rametook::Database.load_config('database.yml')
       
       return true      
     end
     
     # print version messages
     def self.show_version
-      puts APP_INFO
+      puts APP_INFO + ' -- ' + @@rails_env
     end
     
     # print help messages
@@ -107,10 +81,11 @@ Command:
   restart     stop then start
   
 Options:
-  -h, --help      show help
-  -v, --version   show version
-  -c, --color     log using color
-  -r, --raw       log raw AT command      
+  -h, --help        show help
+  -v, --version     show version
+  -c, --color       log using color
+  -r, --raw         log raw AT command      
+  -e, --environment rails environment (db)
 END
     end
     
@@ -122,20 +97,23 @@ END
     
     def self.run
       # set current working directory
-      file_path = File.expand_path(__FILE__) # File.join(Dir.getwd, __FILE__))
-      file_workdir = File.dirname( file_path )
-      file_logdir  = File.join(file_workdir, 'log')
-      Dir.chdir file_workdir
+      #file_path = File.expand_path(__FILE__) # File.join(Dir.getwd, __FILE__))
+      #file_workdir = File.dirname( file_path )
+      #file_logdir  = File.join(file_workdir, 'log')
+      Dir.chdir RAMETOOK_PATH
       
-      @@cwd = Dir.getwd  
+      #@@cwd = Dir.getwd  
       @@name = File.basename($0)
-      @@hostname = Socket.gethostname
-      @@dir = file_workdir 
-      APP_INFO << " on #{@@hostname}"
+      #@@hostname = Socket.gethostname
+      @@dir = Dir.getwd 
+      #APP_INFO << " on #{@@hostname}"
       
       if configure then
         show_version
-      
+        
+        Utility.load_rails_environment(@@rails_env)
+        #DeviceSpooler.init_constants
+              
         stopped = if ['stop','restart'].include?(@@cmd) then
           command_stop
         end
@@ -202,14 +180,15 @@ END
         puts "Found other #{@@name} running #{@@pid}!"
         return
       end           
-      SmsGateway::MainSpooler.start(:dir => @@dir, :name => @@name, :cmd => @@cmd, :hostname => @@hostname)
+      Rametook::MainSpooler.start(:dir => @@dir, :name => @@name, :cmd => @@cmd)
+        # , :hostname => @@hostname
       clean_pid! if @@cmd == 'start'
     end
       
     # command to stop
     def self.command_stop    
       if get_pid then
-        h = File.open("#{@@dir}/#{@@name}.log")
+        h = File.open("#{@@dir}/log/#{@@name}.log")
         h.seek(0, IO::SEEK_END) if h
         
         begin
@@ -258,10 +237,10 @@ END
   end
 end
 
-SmsGateway::Rametook.run
+Rametook::Application.run
 
-#SmsGateway::MainSpooler.config(file_workdir, File.basename($0))
-#Daemons.run_proc(SmsGateway::MainSpooler.prog_name, {:log_output => true,
-#  :ARGV => SmsGateway::MainSpooler.arguments, :multiple => false}) {
-#  SmsGateway::MainSpooler.start
+#Rametook::MainSpooler.config(file_workdir, File.basename($0))
+#Daemons.run_proc(Rametook::MainSpooler.prog_name, {:log_output => true,
+#  :ARGV => Rametook::MainSpooler.arguments, :multiple => false}) {
+#  Rametook::MainSpooler.start
 #}

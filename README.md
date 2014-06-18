@@ -1,4 +1,4 @@
-= Rametook v0.3.4rc - 2008-05-14
+= Rametook v0.3.7rc - 2008-08-04
 
 == About
 
@@ -9,9 +9,13 @@ Send/Receive SMS via Modem/Serial Port using Ruby
 * Can run as a daemon
 * Communication using serial-port (/dev/tty)
 * Multi-modems
-* Text mode 
+* Text mode and PDU mode
 * AT command customizations with modem type profile
 * CDMA/Text mode and GSM/PDU mode
+* Automatic modem recognize
+* Ruby SerialComm for native OS's syscall to serial port communication
+* Modem device Capability: 
+  priority to send or receive only, read when listing sms, etc.
 
 == Installation
 
@@ -65,17 +69,37 @@ Testing Phone:
 Still To Do:
 * Pre-start, flushing buffer for made modem be prepared
 * Full Unicode support, Test it!
-* Automatic modem recognize
 * Message Priority
 * Multipart
 * EMS/Ringtone/Logo messages
+* HEX Mode for Nokia CDMA
 
 In Development:
-
+  
 Bugs:
+* Daemon mode, currently unsupported
+* Problem unicode for GSM PDU, (send japanese text)
 
 == History
 
+* 2008-08-08:
+  - phone class, task class, and device spooler class, also main spooler (rename)
+  - export/import YAML of modem type
+  - modem type capabilites, suchas dont send, read when listing, etc.. (in string)
+  - capabilites when handling send sms status-report, read message ref, etc.
+  - using ruby-serialcomm wrapper for native OS's syscall. Run on win32
+  - modem AT error messages
+  - modular for SMS mode format, for easy add/remove
+  - relation to SMS inbox/outbox to SMS short-message table
+
+* 2008-07-17:
+  - splitting at parsers class, and reducing modem at command table,
+    add modem error message.
+  - rametook using rails environment
+  - auto-reply (keyword processor) called inside rametook daemon
+  - auto detect modem
+  - fixing in modem parser for GSM, not yet tested using CDMA (text mode)
+  
 * 2008-05-14:
   - Fix, how to get working dir in Rametook and Rametook Control, also
     how to handle process that isn't belong to us (root)
@@ -93,7 +117,7 @@ Bugs:
 
 == Credits
 
-Author::   firoDJ <firodj@yahoo.co.id>, <fadhil.mandaga@jerbeeindonesia.com>
-Homepage:: http://firodj.info, http://www.friendster.com/firodj
-License::  GNU General Public License (GPL) Version 3
+Author::   firoDJ <firodj@gmail.com>
+Homepage:: http://firodj.org
+License::  MIT
 
